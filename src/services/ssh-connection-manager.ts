@@ -17,6 +17,7 @@ export class SSHConnectionManager {
   private connected: Map<string, boolean> = new Map();
   private statusCache: Map<string, ServerStatus> = new Map();
   private defaultName: string = "default";
+  private bypassWorkdir: boolean = false;
 
   private constructor() {}
 
@@ -43,6 +44,13 @@ export class SSHConnectionManager {
     } else if (Object.keys(configs).length > 0) {
       this.defaultName = Object.keys(configs)[0];
     }
+  }
+
+  /**
+   * Set bypass workdir flag
+   */
+  public setBypassWorkdir(bypass: boolean): void {
+    this.bypassWorkdir = bypass;
   }
 
   /**
@@ -347,10 +355,13 @@ export class SSHConnectionManager {
    */
   private validateLocalPath(localPath: string): string {
     const resolvedPath = path.resolve(localPath);
+    if (this.bypassWorkdir) {
+      return resolvedPath;
+    }
     const workingDir = process.cwd();
     if (!resolvedPath.startsWith(workingDir)) {
       throw new Error(
-        `Path traversal detected. Local path must be within the working directory.`
+        `Path traversal detected. Local path must be within the working directory. Use --bypass-workdir to allow paths outside the working directory.`
       );
     }
     return resolvedPath;

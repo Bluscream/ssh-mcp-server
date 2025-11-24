@@ -24,6 +24,7 @@ export class CommandLineParser {
         blacklist: { type: "string", short: "B" },
         socksProxy: { type: "string", short: "s" },
         "pre-connect": { type: "boolean" },
+        "bypass-workdir": { type: "boolean" },
       },
       allowPositionals: true,
     });
@@ -130,6 +131,7 @@ export class CommandLineParser {
     return {
       configs: configMap,
       preConnect: values["pre-connect"] === true,
+      bypassWorkdir: values["bypass-workdir"] === true,
     };
   }
 }
